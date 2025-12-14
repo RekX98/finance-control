@@ -55,6 +55,14 @@ button:hover {
   font-weight: bold;
   white-space: pre-line;
 }
+  .result-box {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f1f7ff;
+  border-left: 4px solid #1f4fff;
+  border-radius: 6px;
+  font-size: 16px;
+  }
   </style>
 </head>
 <body>
@@ -83,7 +91,11 @@ button:hover {
 
     <button onclick="calculate()">Порахувати</button>
 
-    <p id="result"></p>
+    <div id="result" class="result-box" style="display:none;">
+  <p><strong>Загальна сума:</strong> <span id="total"></span> грн</p>
+  <p><strong>Переплата:</strong> <span id="overpay"></span> грн</p>
+  <p><strong>Щомісячний платіж:</strong> <span id="monthly"></span> грн</p>
+    </div>
   </div>
 </main>
 <script>
@@ -93,7 +105,7 @@ function calculate() {
   const months = Number(document.getElementById('months').value);
 
   if (!sum || !percent || !months) {
-    document.getElementById('result').innerText = 'Заповніть всі поля';
+    alert('Заповніть всі поля');
     return;
   }
 
@@ -102,10 +114,11 @@ function calculate() {
   const overpay = total - sum;
   const monthlyPay = total / months;
 
-  document.getElementById('result').innerText =
-    'Загальна сума: ' + total.toFixed(2) + ' грн\n' +
-    'Переплата: ' + overpay.toFixed(2) + ' грн\n' +
-    'Щомісячний платіж: ' + monthlyPay.toFixed(2) + ' грн';
+  document.getElementById('total').innerText = total.toFixed(2);
+  document.getElementById('overpay').innerText = overpay.toFixed(2);
+  document.getElementById('monthly').innerText = monthlyPay.toFixed(2);
+
+  document.getElementById('result').style.display = 'block';
 }
 </script>
 </body>
