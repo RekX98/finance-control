@@ -12,12 +12,10 @@
       --text:#0f172a;
       --muted:#64748b;
       --line:#e5e7eb;
+      --danger:#dc2626;
+      --ok:#16a34a;
     }
-    #chart {
-  width: 100%;
-  max-width: 100%;
-  display: block;
-    }
+
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -25,6 +23,7 @@
       background:var(--bg);
       color:var(--text);
     }
+
     header{
       background:var(--blue);
       color:#fff;
@@ -34,7 +33,7 @@
     header h1{margin:0;font-size:28px;font-weight:800}
     header p{margin:8px 0 0;opacity:.9}
 
-    main{max-width:900px;margin:0 auto;padding:16px}
+    main{max-width:950px;margin:0 auto;padding:16px}
     .box{
       background:var(--card);
       border-radius:16px;
@@ -45,7 +44,7 @@
     .box h2{margin:0 0 10px;font-size:26px}
     .box p{margin:0;color:var(--muted);line-height:1.4}
 
-    label{display:block;margin:10px 0 6px;font-weight:700}
+    label{display:block;margin:10px 0 6px;font-weight:800}
     input,select{
       width:100%;
       padding:12px 12px;
@@ -55,7 +54,11 @@
       outline:none;
       background:#fff;
     }
-    input:focus,select:focus{border-color:rgba(31,91,255,.6);box-shadow:0 0 0 4px rgba(31,91,255,.12)}
+    input:focus,select:focus{
+      border-color:rgba(31,91,255,.6);
+      box-shadow:0 0 0 4px rgba(31,91,255,.12)
+    }
+
     .row{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -66,18 +69,44 @@
     }
 
     button{
-      display:inline-block;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       margin-top:14px;
-      padding:12px 18px;
+      padding:12px 16px;
       background:var(--blue);
       color:#fff;
       border:none;
       border-radius:12px;
-      font-size:16px;
-      font-weight:800;
+      font-size:15px;
+      font-weight:900;
       cursor:pointer;
     }
+    button.secondary{
+      background:#0f172a;
+    }
+    button.light{
+      background:#eaf2ff;
+      color:#0f172a;
+      border:1px solid rgba(15,23,42,.10);
+    }
+    button.danger{
+      background:var(--danger);
+    }
     button:active{transform:translateY(1px)}
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .hint{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:6px;
+    }
 
     .result-box{
       display:none;
@@ -90,9 +119,36 @@
     .result-line{
       font-size:18px;
       margin:10px 0;
-      font-weight:800;
+      font-weight:900;
     }
-    .muted{color:var(--muted);font-weight:600}
+    .badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:12px;
+      margin-left:8px;
+      vertical-align:middle;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.1);
+      color:#0f172a;
+    }
+    .badge.danger{border-color:rgba(220,38,38,.35); color:var(--danger)}
+    .badge.ok{border-color:rgba(22,163,74,.35); color:var(--ok)}
+
+    .chartWrap{
+      margin-top:10px;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.08);
+      border-radius:12px;
+      padding:10px;
+    }
+    #chart{
+      width:100%;
+      max-width:100%;
+      display:block;
+      height:220px;
+    }
 
     .tableWrap{
       margin-top:14px;
@@ -104,7 +160,7 @@
     table{
       width:100%;
       border-collapse:collapse;
-      min-width:520px;
+      min-width:560px;
     }
     th,td{
       padding:10px 10px;
@@ -118,10 +174,62 @@
       font-weight:900;
     }
     tr:last-child td{border-bottom:none}
-    .hint{
-      font-size:13px;
-      color:var(--muted);
+
+    .savedBox{
+      display:none;
+      margin-top:14px;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:14px;
+      padding:14px;
+    }
+    .savedHeader{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .savedHeader h3{margin:0}
+    .savedList{
+      display:grid;
+      gap:10px;
+    }
+    .savedItem{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:12px;
+      padding:12px;
+      background:#fafbff;
+    }
+    .savedItem .top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      font-weight:900;
+    }
+    .savedItem .meta{
       margin-top:6px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .savedItem .btns{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    /* Print */
+    @media print {
+      header, .actions, .savedBox, .hint { display:none !important; }
+      body { background:#fff; }
+      .box { box-shadow:none; border:1px solid #ddd; }
+      .result-box { display:block !important; }
+      .tableWrap { overflow:visible; }
+      table { min-width:auto; }
     }
   </style>
 </head>
@@ -129,13 +237,13 @@
 <body>
   <header>
     <h1>Фінансовий контроль</h1>
-    <p>Просто та зрозуміло</p>
+    <p>Калькулятор кредиту + графік + експорт + збереження</p>
   </header>
 
   <main>
     <div class="box">
       <h2>Для чого цей сайт</h2>
-      <p>Контроль боргів, платежів та фінансових рішень.</p>
+      <p>Контроль боргів, платежів та фінансових рішень. Дані зберігаються лише у вашому браузері.</p>
     </div>
 
     <div class="box">
@@ -148,7 +256,7 @@
         <div>
           <label>Відсоток</label>
           <input type="number" id="percent" placeholder="Наприклад: 5" inputmode="decimal" />
-          <div class="hint">Можна вводити 5 або 55 — як у договорі.</div>
+          <div class="hint">Вводь як у договорі: 5 або 55.</div>
         </div>
         <div>
           <label>Період відсотка</label>
@@ -169,25 +277,29 @@
           <label>Тип кредиту</label>
           <select id="loanType">
             <option value="annuity">Аннуїтетний (рівний платіж)</option>
-            <option value="diff">Диференційований (тіло рівними частинами)</option>
+            <option value="diff">Диференційований (платіж зменшується)</option>
           </select>
+          <div class="hint">Аннуїтет: платіж рівний. Диференц.: перші платежі більші.</div>
         </div>
       </div>
 
-      <button type="button" onclick="calculate()">Порахувати</button>
-      <label>Тип кредиту</label>
-<select id="creditType">
-  <option value="annuity">Аннуїтетний (рівний платіж)</option>
-  <option value="diff">Диференційований</option>
-</select>
+      <div class="actions">
+        <button type="button" onclick="calculate()">🧮 Порахувати</button>
+        <button type="button" class="light" onclick="fillDemo()">✨ Демо</button>
+        <button type="button" class="secondary" onclick="toggleSaved()">📂 Історія</button>
+      </div>
+
       <div id="result" class="result-box">
-        <div class="result-line">Загальна сума: <span id="total">0.00</span> грн</div>
-        <div class="result-line">Переплата: <span id="overpay">0.00</span> грн</div>
-        <div class="result-line">Щомісячний платіж: <span id="monthly">0.00</span> грн</div>
+        <div class="result-line">Загальна сума: <span id="total">0.00</span> грн <span id="badgeTotal" class="badge"></span></div>
+        <div class="result-line">Переплата: <span id="overpay">0.00</span> грн <span id="badgeOver" class="badge"></span></div>
+        <div class="result-line">Щомісячний платіж: <span id="monthly">0.00</span> грн <span class="badge">аналітика</span></div>
+
+        <h3 style="margin:18px 0 10px;">Графік залишку боргу</h3>
+        <div class="chartWrap">
+          <canvas id="chart" height="220"></canvas>
+        </div>
 
         <h3 style="margin:18px 0 10px;">Графік платежів</h3>
-        <h3 style="margin:18px 0 10px;">Графік залишку боргу</h3>
-<canvas id="chart" height="220"></canvas>
         <div class="tableWrap">
           <table id="paymentTable">
             <thead>
@@ -202,51 +314,44 @@
           </table>
         </div>
 
+        <div class="actions" style="margin-top:12px;">
+          <button type="button" onclick="saveCalculation()">💾 Зберегти</button>
+          <button type="button" class="light" onclick="exportPDF()">📄 PDF</button>
+          <button type="button" class="light" onclick="exportExcel()">📊 Excel</button>
+          <button type="button" class="light" onclick="window.print()">🖨️ Друк</button>
+        </div>
+
         <div class="hint" style="margin-top:10px;">
           Увага: це спрощений розрахунок (без комісій/штрафів/страховок).
         </div>
       </div>
+
+      <div id="savedBox" class="savedBox">
+        <div class="savedHeader">
+          <h3>Збережені розрахунки</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="light" type="button" onclick="exportSavedCSV()">⬇️ CSV</button>
+            <button class="danger" type="button" onclick="clearSaved()">🗑️ Очистити</button>
+          </div>
+        </div>
+        <div id="savedList" class="savedList"></div>
+        <div class="hint">Зберігається лише на цьому пристрої (localStorage).</div>
+      </div>
     </div>
   </main>
 
+  <!-- Libraries for export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
   <script>
-    function drawChart(data){
-  const canvas = document.getElementById('chart');
-  const ctx = canvas.getContext('2d');
-
-  const w = canvas.width = canvas.offsetWidth;
-  const h = canvas.height;
-
-  ctx.clearRect(0,0,w,h);
-
-  const max = Math.max(...data);
-  const stepX = w / (data.length - 1);
-
-  ctx.beginPath();
-  ctx.moveTo(0, h - (data[0] / max) * h);
-
-  data.forEach((v,i)=>{
-    const x = i * stepX;
-    const y = h - (v / max) * h;
-    ctx.lineTo(x,y);
-  });
-
-  ctx.strokeStyle = '#1f5bff';
-  ctx.lineWidth = 3;
-  ctx.stroke();
-
-  // точки
-  ctx.fillStyle = '#1f5bff';
-  data.forEach((v,i)=>{
-    const x = i * stepX;
-    const y = h - (v / max) * h;
-    ctx.beginPath();
-    ctx.arc(x,y,4,0,Math.PI*2);
-    ctx.fill();
-  });
-    }
+    // ---------- helpers ----------
     function fmt(n){
       return (Math.round(n * 100) / 100).toFixed(2);
+    }
+
+    function nowStr(){
+      return new Date().toLocaleString();
     }
 
     function getMonthlyRate(){
@@ -254,150 +359,156 @@
       const rateType = document.getElementById('rateType').value; // month|year
       if (!percent) return 0;
 
-      // r = monthly rate in decimals
       if (rateType === 'year') return (percent / 100) / 12;
       return (percent / 100);
     }
-    function addRow(month, interest, payment, balance) {
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>${month}</td>
-    <td>${interest.toFixed(2)}</td>
-    <td>${payment.toFixed(2)}</td>
-    <td>${balance.toFixed(2)}</td>
-  `;
-  document.querySelector('#paymentTable tbody').appendChild(row);
-}
 
+    function addRow(month, interest, payment, balance) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${month}</td>
+        <td>${fmt(interest)}</td>
+        <td>${fmt(payment)}</td>
+        <td>${fmt(balance)}</td>
+      `;
+      document.querySelector('#paymentTable tbody').appendChild(row);
+    }
+
+    // ---------- chart ----------
+    function drawChart(data){
+      const canvas = document.getElementById('chart');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+
+      // ensure correct width after display
+      const w = canvas.width = canvas.offsetWidth || canvas.parentElement.offsetWidth || 600;
+      const h = canvas.height;
+
+      ctx.clearRect(0,0,w,h);
+
+      if (!data || data.length < 2) return;
+
+      const max = Math.max(...data);
+      const stepX = w / (data.length - 1);
+
+      // background grid
+      ctx.globalAlpha = 0.35;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#cbd5e1';
+      for (let i = 0; i <= 4; i++){
+        const y = (h/4)*i;
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(w,y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // line
+      ctx.beginPath();
+      ctx.moveTo(0, h - (data[0] / max) * h);
+
+      data.forEach((v,i)=>{
+        const x = i * stepX;
+        const y = h - (v / max) * h;
+        ctx.lineTo(x,y);
+      });
+
+      ctx.strokeStyle = '#1f5bff';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // points
+      ctx.fillStyle = '#1f5bff';
+      data.forEach((v,i)=>{
+        const x = i * stepX;
+        const y = h - (v / max) * h;
+        ctx.beginPath();
+        ctx.arc(x,y,3.5,0,Math.PI*2);
+        ctx.fill();
+      });
+    }
+
+    // ---------- main calc ----------
     function calculate(){
       const sum = Number(document.getElementById('sum').value);
       const months = Number(document.getElementById('months').value);
       const loanType = document.getElementById('loanType').value; // annuity|diff
-      const creditType = document.getElementById('creditType').value;
       const r = getMonthlyRate();
 
       if (!sum || !months){
         alert('Заповніть всі поля');
         return;
       }
-      if (months <= 0){
-        alert('Термін має бути більше 0');
+      if (months <= 0 || sum <= 0){
+        alert('Сума і термін мають бути більше 0');
         return;
       }
-      if (sum <= 0){
-        alert('Сума має бути більше 0');
-        return;
-      }
-      if (creditType === 'annuity') {
-
-  const monthlyPercent = percent / 100;
-  const r = monthlyPercent;
-  const n = months;
-
-  const monthlyPay = sum * r / (1 - Math.pow(1 + r, -n));
-
-  for (let i = 1; i <= n; i++) {
-    const interest = balance * r;
-    const principal = monthlyPay - interest;
-
-    balance -= principal;
-    if (balance < 0.01) balance = 0;
-
-    totalPaid += monthlyPay;
-    totalInterest += interest;
-
-    chartData.push(balance);
-
-    addRow(i, interest, monthlyPay, balance);
-  }
-
 
       const resultBox = document.getElementById('result');
       const tbody = document.querySelector('#paymentTable tbody');
-      tbody.innerHTML = '';
-      // очищаємо таблицю
-      tbody.innerHTML = '';
-      const chartData = [];
-      let balance = sum;
-let totalPaid = 0;
-let totalInterest = 0;
-let chartData = [];
 
+      // clear table
+      tbody.innerHTML = '';
+
+      let balance = sum;
       let totalPaid = 0;
       let totalInterest = 0;
+      let chartData = [sum];
 
+      // annuity: equal monthly payment
       if (loanType === 'annuity'){
-        // Аннуїтет: рівний платіж
         let monthlyPay;
+
         if (r === 0){
           monthlyPay = sum / months;
         } else {
-          // A = S * r / (1 - (1+r)^-n)
           monthlyPay = sum * r / (1 - Math.pow(1 + r, -months));
         }
-
-        let balance = sum;
 
         for (let i = 1; i <= months; i++){
           const interest = balance * r;
           let principal = monthlyPay - interest;
-          chartData.push(balance);
 
-          // якщо останній платіж «переплачує» копійки — підрізаємо
-          if (principal > balance) {
-            principal = balance;
-          }
+          // last payment adjust (avoid negative pennies)
+          if (principal > balance) principal = balance;
 
           const payment = principal + interest;
-          balance = balance - principal;
+
+          balance -= principal;
           if (balance < 0.01) balance = 0;
 
           totalPaid += payment;
           totalInterest += interest;
 
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${i}</td>
-            <td>${fmt(interest)}</td>
-            <td>${fmt(payment)}</td>
-            <td>${fmt(balance)}</td>
-          `;
-          tbody.appendChild(row);
+          chartData.push(balance);
+          addRow(i, interest, payment, balance);
         }
 
         document.getElementById('monthly').innerText = fmt(monthlyPay);
-
       } else {
-        // Диференційований: тіло рівними частинами
+        // diff: equal principal, decreasing payment
         const principalPart = sum / months;
-        let balance = sum;
 
-        // покажемо "типовий" платіж першого місяця як "щомісячний"
-        const firstMonthPay = principalPart + (balance * r);
-        document.getElementById('monthly').innerText = fmt(firstMonthPay);
+        // show first month payment as "monthly"
+        document.getElementById('monthly').innerText = fmt(principalPart + balance * r);
 
         for (let i = 1; i <= months; i++){
           const interest = balance * r;
           let principal = principalPart;
-
-          // останній місяць — закриваємо залишок точно
           if (principal > balance) principal = balance;
 
           const payment = principal + interest;
-          balance = balance - principal;
+
+          balance -= principal;
           if (balance < 0.01) balance = 0;
 
           totalPaid += payment;
           totalInterest += interest;
 
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${i}</td>
-            <td>${fmt(interest)}</td>
-            <td>${fmt(payment)}</td>
-            <td>${fmt(balance)}</td>
-          `;
-          tbody.appendChild(row);
+          chartData.push(balance);
+          addRow(i, interest, payment, balance);
         }
       }
 
@@ -406,20 +517,234 @@ let chartData = [];
       document.getElementById('total').innerText = fmt(totalPaid);
       document.getElementById('overpay').innerText = fmt(overpay);
 
-      // показываем блок результатов
-resultBox.style.display = 'block';
-resultBox.scrollIntoView({ behavior: 'smooth' });
+      // badges
+      const badgeTotal = document.getElementById('badgeTotal');
+      const badgeOver = document.getElementById('badgeOver');
 
-setTimeout(() => {
-  drawChart(chartData);
-}, 50);
-      document.getElementById('total').innerText = totalPaid.toFixed(2);
-document.getElementById('overpay').innerText = (totalPaid - sum).toFixed(2);
-document.getElementById('monthly').innerText = monthlyPay.toFixed(2);
+      badgeTotal.className = 'badge';
+      badgeOver.className = 'badge';
 
-drawChart(chartData);
-document.getElementById('result').style.display = 'block';
+      if (overpay > sum){
+        badgeOver.classList.add('danger');
+        badgeOver.textContent = '⚠️ переплата > суми';
+      } else {
+        badgeOver.classList.add('ok');
+        badgeOver.textContent = 'OK';
+      }
+
+      if (r >= 0.30){
+        badgeTotal.classList.add('danger');
+        badgeTotal.textContent = '⚠️ дуже високий %';
+      } else if (r === 0){
+        badgeTotal.classList.add('ok');
+        badgeTotal.textContent = '0%';
+      } else {
+        badgeTotal.classList.add('ok');
+        badgeTotal.textContent = 'норма';
+      }
+
+      // show result
+      resultBox.style.display = 'block';
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // draw chart after layout
+      setTimeout(() => drawChart(chartData), 50);
+
+      // store last calculation to enable quick save/export
+      window.__lastCalc = buildCalcObject(totalPaid, overpay, totalInterest);
+    }
+
+    function buildCalcObject(totalPaid, overpay, totalInterest){
+      return {
+        id: cryptoId(),
+        date: nowStr(),
+        sum: Number(document.getElementById('sum').value),
+        percent: Number(document.getElementById('percent').value),
+        rateType: document.getElementById('rateType').value,
+        months: Number(document.getElementById('months').value),
+        loanType: document.getElementById('loanType').value,
+        total: Number(totalPaid),
+        overpay: Number(overpay),
+        interest: Number(totalInterest)
+      };
+    }
+
+    function cryptoId(){
+      // simple unique id without external libs
+      return 'id_' + Math.random().toString(16).slice(2) + '_' + Date.now().toString(16);
+    }
+
+    function fillDemo(){
+      document.getElementById('sum').value = 5555;
+      document.getElementById('percent').value = 55;
+      document.getElementById('rateType').value = 'month';
+      document.getElementById('months').value = 6;
+      document.getElementById('loanType').value = 'annuity';
+      calculate();
+    }
+
+    // ---------- Save / History ----------
+    function getSaved(){
+      return JSON.parse(localStorage.getItem('calculations') || '[]');
+    }
+    function setSaved(arr){
+      localStorage.setItem('calculations', JSON.stringify(arr));
+    }
+
+    function saveCalculation(){
+      // require a successful calculation
+      if (!window.__lastCalc){
+        alert('Спочатку зробіть розрахунок');
+        return;
+      }
+      const saved = getSaved();
+      saved.unshift(window.__lastCalc);
+      setSaved(saved);
+      renderSaved();
+      alert('Розрахунок збережено ✔');
+    }
+
+    function toggleSaved(){
+      const box = document.getElementById('savedBox');
+      const isOpen = box.style.display === 'block';
+      box.style.display = isOpen ? 'none' : 'block';
+      if (!isOpen) renderSaved();
+      if (!isOpen) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderSaved(){
+      const list = document.getElementById('savedList');
+      const saved = getSaved();
+      list.innerHTML = '';
+
+      if (!saved.length){
+        list.innerHTML = '<div class="hint">Немає збережених розрахунків.</div>';
+        return;
+      }
+
+      saved.slice(0, 30).forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'savedItem';
+
+        const typeLabel = item.loanType === 'annuity' ? 'Аннуїтет' : 'Диференц.';
+        const rateLabel = item.rateType === 'year' ? '%/рік' : '%/міс';
+
+        div.innerHTML = `
+          <div class="top">
+            <div>${item.date} <span class="badge">${typeLabel}</span></div>
+            <div><b>Переплата:</b> ${fmt(item.overpay)} грн</div>
+          </div>
+          <div class="meta">
+            Сума: <b>${fmt(item.sum)}</b> грн · %: <b>${item.percent}</b> (${rateLabel}) · Місяців: <b>${item.months}</b><br/>
+            Всього: <b>${fmt(item.total)}</b> грн
+          </div>
+          <div class="btns">
+            <button class="light" type="button" onclick="loadSaved('${item.id}')">↩️ Завантажити</button>
+            <button class="danger" type="button" onclick="deleteSaved('${item.id}')">🗑️ Видалити</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function loadSaved(id){
+      const saved = getSaved();
+      const item = saved.find(x => x.id === id);
+      if (!item) return;
+
+      document.getElementById('sum').value = item.sum;
+      document.getElementById('percent').value = item.percent;
+      document.getElementById('rateType').value = item.rateType;
+      document.getElementById('months').value = item.months;
+      document.getElementById('loanType').value = item.loanType;
+
+      calculate();
+    }
+
+    function deleteSaved(id){
+      const saved = getSaved().filter(x => x.id !== id);
+      setSaved(saved);
+      renderSaved();
+    }
+
+    function clearSaved(){
+      if (!confirm('Точно очистити всі збережені розрахунки?')) return;
+      localStorage.removeItem('calculations');
+      renderSaved();
+    }
+
+    function exportSavedCSV(){
+      const saved = getSaved();
+      if (!saved.length){
+        alert('Немає збережених розрахунків');
+        return;
+      }
+
+      const headers = ['date','sum','percent','rateType','months','loanType','total','overpay','interest'];
+      const rows = [headers.join(',')];
+
+      saved.forEach(s=>{
+        const row = headers.map(h => {
+          const v = s[h];
+          // escape commas/quotes
+          const str = String(v ?? '').replace(/"/g,'""');
+          return `"${str}"`;
+        }).join(',');
+        rows.push(row);
+      });
+
+      const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'saved-calculations.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // ---------- Export current result ----------
+    function exportPDF(){
+      const element = document.getElementById('result');
+      if (!element || element.style.display === 'none'){
+        alert('Спочатку зробіть розрахунок');
+        return;
+      }
+      const opt = {
+        margin: 10,
+        filename: 'kredit-rozrahunok.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+
+    function exportExcel(){
+      const table = document.getElementById('paymentTable');
+      if (!table) return;
+
+      // workbook
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(table);
+      XLSX.utils.book_append_sheet(wb, ws, 'Графік');
+
+      // add summary sheet
+      const summary = [
+        ['Дата', nowStr()],
+        ['Сума', document.getElementById('sum').value],
+        ['Відсоток', document.getElementById('percent').value],
+        ['Період', document.getElementById('rateType').value],
+        ['Місяців', document.getElementById('months').value],
+        ['Тип', document.getElementById('loanType').value],
+        ['Загальна сума', document.getElementById('total').innerText],
+        ['Переплата', document.getElementById('overpay').innerText],
+        ['Щомісячний', document.getElementById('monthly').innerText]
+      ];
+      const ws2 = XLSX.utils.aoa_to_sheet(summary);
+      XLSX.utils.book_append_sheet(wb, ws2, 'Підсумок');
+
+      XLSX.writeFile(wb, 'kredit-rozrahunok.xlsx');
     }
   </script>
 </body>
 </html>
+
