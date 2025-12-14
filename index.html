@@ -177,6 +177,8 @@
         <div class="result-line">Щомісячний платіж: <span id="monthly">0.00</span> грн</div>
 
         <h3 style="margin:18px 0 10px;">Графік платежів</h3>
+        <h3 style="margin:18px 0 10px;">Графік залишку боргу</h3>
+<canvas id="chart" height="220"></canvas>
         <div class="tableWrap">
           <table id="paymentTable">
             <thead>
@@ -199,6 +201,41 @@
   </main>
 
   <script>
+    function drawChart(data){
+  const canvas = document.getElementById('chart');
+  const ctx = canvas.getContext('2d');
+
+  const w = canvas.width = canvas.offsetWidth;
+  const h = canvas.height;
+
+  ctx.clearRect(0,0,w,h);
+
+  const max = Math.max(...data);
+  const stepX = w / (data.length - 1);
+
+  ctx.beginPath();
+  ctx.moveTo(0, h - (data[0] / max) * h);
+
+  data.forEach((v,i)=>{
+    const x = i * stepX;
+    const y = h - (v / max) * h;
+    ctx.lineTo(x,y);
+  });
+
+  ctx.strokeStyle = '#1f5bff';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // точки
+  ctx.fillStyle = '#1f5bff';
+  data.forEach((v,i)=>{
+    const x = i * stepX;
+    const y = h - (v / max) * h;
+    ctx.beginPath();
+    ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fill();
+  });
+    }
     function fmt(n){
       return (Math.round(n * 100) / 100).toFixed(2);
     }
@@ -237,6 +274,7 @@
 
       // очищаємо таблицю
       tbody.innerHTML = '';
+      const chartData = [];
 
       let totalPaid = 0;
       let totalInterest = 0;
@@ -256,6 +294,7 @@
         for (let i = 1; i <= months; i++){
           const interest = balance * r;
           let principal = monthlyPay - interest;
+          chartData.push(balance);
 
           // якщо останній платіж «переплачує» копійки — підрізаємо
           if (principal > balance) {
@@ -321,6 +360,7 @@
       document.getElementById('overpay').innerText = fmt(overpay);
 
       // показываем блок результатов
+      drawChart(chartData);
       resultBox.style.display = 'block';
       resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
