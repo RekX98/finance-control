@@ -145,7 +145,14 @@ tbody.innerHTML = '';
 let balance = sum;
 
 for (let i = 1; i <= months; i++) {
-  const interest = balance * r;
+  // очищаем таблицу
+const tbody = document.querySelector('#paymentTable tbody');
+tbody.innerHTML = '';
+
+let balance = sum;
+
+for (let i = 1; i <= months; i++) {
+  const interest = balance * monthlyPercent;
   const principal = monthlyPay - interest;
   balance -= principal;
 
@@ -161,24 +168,22 @@ for (let i = 1; i <= months; i++) {
   tbody.appendChild(row);
 }
 
-  const interest = balance * monthlyPercent;
+document.getElementById('total').innerText = total.toFixed(2);
+document.getElementById('overpay').innerText = overpay.toFixed(2);
+document.getElementById('monthly').innerText = monthlyPay.toFixed(2);
+document.getElementById('result').style.display = 'block';
+  const principal = monthlyPay - interest;
+  balance -= principal;
 
-  let payment = monthlyPay;
-  if (balance + interest < monthlyPay) {
-    payment = balance + interest; // последний платёж
-  }
-
-  balance = balance + interest - payment;
+  if (balance < 0) balance = 0;
 
   const row = document.createElement('tr');
-
   row.innerHTML = `
     <td>${i}</td>
     <td>${interest.toFixed(2)}</td>
     <td>${monthlyPay.toFixed(2)}</td>
-    <td>${balance > 0 ? balance.toFixed(2) : '0.00'}</td>
+    <td>${balance.toFixed(2)}</td>
   `;
-
   tbody.appendChild(row);
 }
 
