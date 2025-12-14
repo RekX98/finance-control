@@ -92,11 +92,29 @@ button:hover {
     <button onclick="calculate()">Порахувати</button>
 
     <div id="result" class="result-box" style="display:none;">
-  <p><strong>Загальна сума:</strong> <span id="total"></span> грн</p>
-  <p><strong>Переплата:</strong> <span id="overpay"></span> грн</p>
-  <p><strong>Щомісячний платіж:</strong> <span id="monthly"></span> грн</p>
-    </div>
+
+  <p><strong>Загальна сума:</strong> <span id="total"></span></p>
+  <p><strong>Переплата:</strong> <span id="overpay"></span></p>
+  <p><strong>Щомісячний платіж:</strong> <span id="monthly"></span></p>
+
+  <div id="tableBox" style="margin-top:20px; display:none;">
+    <h3>Графік платежів</h3>
+
+    <table id="paymentTable" border="1" width="100%" cellpadding="6">
+      <thead>
+        <tr>
+          <th>Місяць</th>
+          <th>Відсотки</th>
+          <th>Платіж</th>
+          <th>Залишок</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
   </div>
+
+    </div>
 </main>
 <script>
 function calculate() {
@@ -113,6 +131,31 @@ function calculate() {
   const total = sum + (sum * monthlyPercent * months);
   const overpay = total - sum;
   const monthlyPay = total / months;
+  // показуємо блок результатів
+document.getElementById('result').style.display = 'block';
+document.getElementById('tableBox').style.display = 'block';
+
+// очищаємо таблицю
+const tbody = document.querySelector('#paymentTable tbody');
+tbody.innerHTML = '';
+
+let balance = sum;
+
+for (let i = 1; i <= months; i++) {
+  const interest = balance * monthlyPercent;
+  balance = balance + interest - monthlyPay;
+
+  const row = document.createElement('tr');
+
+  row.innerHTML = `
+    <td>${i}</td>
+    <td>${interest.toFixed(2)}</td>
+    <td>${monthlyPay.toFixed(2)}</td>
+    <td>${balance > 0 ? balance.toFixed(2) : '0.00'}</td>
+  `;
+
+  tbody.appendChild(row);
+}
 
   document.getElementById('total').innerText = total.toFixed(2);
   document.getElementById('overpay').innerText = overpay.toFixed(2);
