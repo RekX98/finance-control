@@ -375,33 +375,39 @@
     }
 
     // ---------- chart ----------
-    function drawChart(data){
-      const canvas = document.getElementById('chart');
-      if (!canvas) return;
+    function drawChart(dataA, dataB){
+  const canvas = document.getElementById('chart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
 
-      const ctx = canvas.getContext('2d');
+  const w = canvas.width = canvas.offsetWidth || 600;
+  const h = canvas.height;
 
-      // ensure correct width after display
-      const w = canvas.width = canvas.offsetWidth || canvas.parentElement.offsetWidth || 600;
-      const h = canvas.height;
+  ctx.clearRect(0,0,w,h);
 
-      ctx.clearRect(0,0,w,h);
+  const max = Math.max(
+    ...dataA,
+    ...(dataB || [])
+  );
+  const stepX = w / (dataA.length - 1);
 
-      if (!data || data.length < 2) return;
+  function drawLine(data, color){
+    ctx.beginPath();
+    ctx.moveTo(0, h - (data[0] / max) * h);
+    data.forEach((v,i)=>{
+      const x = i * stepX;
+      const y = h - (v / max) * h;
+      ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
 
-      const max = Math.max(...data);
-      const stepX = w / (data.length - 1);
+  drawLine(dataA, '#1f5bff'); // аннуитет
+  if (dataB) drawLine(dataB, '#16a34a'); // дифф
+}
 
-      // background grid
-      ctx.globalAlpha = 0.35;
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#cbd5e1';
-      for (let i = 0; i <= 4; i++){
-        const y = (h/4)*i;
-        ctx.beginPath();
-        ctx.moveTo(0,y);
-        ctx.lineTo(w,y);
-        ctx.stroke();
       }
       ctx.globalAlpha = 1;
 
@@ -436,6 +442,30 @@
       const months = Number(document.getElementById('months').value);
       const loanType = document.getElementById('loanType').value; // annuity|diff
       const r = getMonthlyRate();
+      const warningBoxId = 'rateWarning';
+let warningBox = document.getElementById(warningBoxId);
+let chartAnnuity = [];
+let chartDiff = [];      
+if (!warningBox){
+  warningBox = document.createElement('div');
+  warningBox.id = warningBoxId;
+  warningBox.className = 'hint';
+  document.getElementById('result').prepend(warningBox);
+}
+
+warningBox.innerHTML = '';
+warningBox.style.color = '';
+
+if (r >= 0.30){
+  warningBox.innerHTML = '⚠️ Увага: відсоток дуже високий (кабальні умови).';
+  warningBox.style.color = '#dc2626';
+} else if (r >= 0.05){
+  warningBox.innerHTML = '❗ Високий відсоток. Переплата може бути значною.';
+  warningBox.style.color = '#b45309';
+} else {
+  warningBox.innerHTML = '✅ Відсоток у межах норми.';
+  warningBox.style.color = '#166534';
+}
 
       if (!sum || !months){
         alert('Заповніть всі поля');
@@ -478,6 +508,8 @@
 
           balance -= principal;
           if (balance < 0.01) balance = 0;
+          chartAnnuity.push(balance);
+
 
           totalPaid += payment;
           totalInterest += interest;
@@ -503,6 +535,7 @@
 
           balance -= principal;
           if (balance < 0.01) balance = 0;
+          chartDiff.push(balance);
 
           totalPaid += payment;
           totalInterest += interest;
@@ -548,7 +581,7 @@
       resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       // draw chart after layout
-      setTimeout(() => drawChart(chartData), 50);
+     setTimeout(() => drawChart(chartAnnuity, chartDiff), 50);
 
       // store last calculation to enable quick save/export
       window.__lastCalc = buildCalcObject(totalPaid, overpay, totalInterest);
@@ -603,6 +636,12 @@
       renderSaved();
       alert('Розрахунок збережено ✔');
     }
+    function clearSaved(){
+  if (!confirm('Точно видалити всі збережені розрахунки?')) return;
+  localStorage.removeItem('calculations');
+  renderSaved();
+  alert('Усі збережені розрахунки очищено');
+}
 
     function toggleSaved(){
       const box = document.getElementById('savedBox');
