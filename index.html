@@ -128,9 +128,12 @@ function calculate() {
   }
 
   const monthlyPercent = percent / 100;
-  const total = sum + (sum * monthlyPercent * months);
-  const overpay = total - sum;
-  const monthlyPay = total / months;
+  const r = monthlyPercent;
+const n = months;
+
+const monthlyPay = sum * r / (1 - Math.pow(1 + r, -n));
+const total = monthlyPay * n;
+const overpay = total - sum;
   // показуємо блок результатів
 document.getElementById('result').style.display = 'block';
 document.getElementById('tableBox').style.display = 'block';
@@ -142,10 +145,21 @@ tbody.innerHTML = '';
 let balance = sum;
 
 for (let i = 1; i <= months; i++) {
+  const interest = balance * r;
+  const principal = monthlyPay - interest;
+  balance -= principal;
 
-  if (balance <= 0) {
-    break; // останавливаем график
-  }
+  if (balance < 0) balance = 0;
+
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${i}</td>
+    <td>${interest.toFixed(2)}</td>
+    <td>${monthlyPay.toFixed(2)}</td>
+    <td>${balance.toFixed(2)}</td>
+  `;
+  tbody.appendChild(row);
+}
 
   const interest = balance * monthlyPercent;
 
