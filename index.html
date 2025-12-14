@@ -88,7 +88,11 @@ button:hover {
 
     <label>Термін (місяців)</label><br>
     <input type="number" id="months" placeholder="Наприклад: 12"><br><br>
-
+    <label>Тип кредиту</label><br>
+<select id="type">
+  <option value="annuity">Аннуїтетний (рівний платіж)</option>
+  <option value="diff">Диференційований (платіж зменшується)</option>
+</select><br><br>
     <button onclick="calculate()">Порахувати</button>
 
     <div id="result" class="result-box" style="display:none;">
@@ -118,6 +122,7 @@ button:hover {
 </main>
 <script>
 function calculate() {
+  const type = document.getElementById('type').value;
   const sum = Number(document.getElementById('sum').value);
   const percent = Number(document.getElementById('percent').value);
   const months = Number(document.getElementById('months').value);
@@ -143,35 +148,8 @@ const tbody = document.querySelector('#paymentTable tbody');
 tbody.innerHTML = '';
 
 let balance = sum;
-
-for (let i = 1; i <= months; i++) {
-  // очищаем таблицу
-const tbody = document.querySelector('#paymentTable tbody');
-tbody.innerHTML = '';
-
-let balance = sum;
-
-for (let i = 1; i <= months; i++) {
-  const interest = balance * monthlyPercent;
-  const principal = monthlyPay - interest;
-  balance -= principal;
-
-  if (balance < 0) balance = 0;
-
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>${i}</td>
-    <td>${interest.toFixed(2)}</td>
-    <td>${monthlyPay.toFixed(2)}</td>
-    <td>${balance.toFixed(2)}</td>
-  `;
-  tbody.appendChild(row);
-}
-
-document.getElementById('total').innerText = total.toFixed(2);
-document.getElementById('overpay').innerText = overpay.toFixed(2);
-document.getElementById('monthly').innerText = monthlyPay.toFixed(2);
-document.getElementById('result').style.display = 'block';
+for (let i = 1; i <= n; i++) {
+  const interest = balance * r;
   const principal = monthlyPay - interest;
   balance -= principal;
 
