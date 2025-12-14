@@ -40,14 +40,44 @@
     <p>Контроль боргів, платежів та фінансових рішень.</p>
   </div>
 
-  <div class="box">
-    <h2>Плани</h2>
-    <ul>
-      <li>Калькулятор боргів</li>
-      <li>Корисні поради</li>
-      <li>Розрахунки</li>
-    </ul>
-  </div>
+  
+    <div class="box">
+  <h2>Калькулятор боргу</h2>
+
+  <label>Сума боргу (грн)</label><br>
+  <input type="number" id="sum" placeholder="Наприклад: 10000"><br><br>
+
+  <label>Відсоток (% на місяць)</label><br>
+  <input type="number" id="percent" placeholder="Наприклад: 5"><br><br>
+
+  <label>Термін (місяців)</label><br>
+  <input type="number" id="months" placeholder="Наприклад: 12"><br><br>
+
+  <button onclick="calculate()">Порахувати</button>
+
+  <p id="result" style="margin-top:15px;font-weight:bold; white-space: pre-line;"></p>
+</div>
+
+<script>
+function calculate() {
+  const sum = Number(document.getElementById('sum').value);
+  const percent = Number(document.getElementById('percent').value);
+  const months = Number(document.getElementById('months').value);
+
+  if (!sum || !percent || !months) {
+    document.getElementById('result').innerText = 'Заповніть всі поля';
+    return;
+  }
+
+  const total = sum + (sum * (percent / 100) * months);
+  const overpay = total - sum;
+
+  document.getElementById('result').innerText =
+    'Загальна сума: ' + total.toFixed(2) + ' грн\n' +
+    'Переплата: ' + overpay.toFixed(2) + ' грн';
+}
+</script>
+    
 </main>
 
 </body>
