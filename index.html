@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Фінансовий контроль</title>
 
 <style>
@@ -12,35 +12,29 @@
   --card:#fff;
   --text:#0f172a;
   --muted:#64748b;
-  --line:#e5e7eb;
   --danger:#dc2626;
   --ok:#16a34a;
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
 header{background:var(--blue);color:#fff;padding:24px;text-align:center}
-main{max-width:950px;margin:auto;padding:16px}
+main{max-width:960px;margin:auto;padding:16px}
 .box{background:var(--card);border-radius:16px;padding:18px;margin:14px 0}
 label{display:block;margin-top:10px;font-weight:800}
-input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px}
+input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:720px){.row{grid-template-columns:1fr}}
 button{padding:12px 16px;border:none;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;cursor:pointer}
 button.light{background:#eaf2ff;color:#000}
 button.danger{background:var(--danger)}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.result-box{display:none;margin-top:14px;background:#eaf2ff;border-left:6px solid var(--blue);padding:14px;border-radius:14px}
-.badge{padding:4px 8px;border-radius:999px;font-size:12px;font-weight:800}
-.badge.ok{color:var(--ok)}
-.badge.danger{color:var(--danger)}
-.tableWrap{margin-top:14px;overflow:auto;background:#fff;border-radius:12px}
-table{width:100%;border-collapse:collapse;min-width:560px}
-th,td{padding:10px;border-bottom:1px solid var(--line);text-align:center}
-.chartWrap{background:#fff;padding:10px;border-radius:12px}
-#chart{width:100%;height:220px}
-.savedBox{display:none;background:#fff;padding:14px;border-radius:14px;margin-top:14px}
-.savedItem{border:1px solid var(--line);padding:12px;border-radius:12px;margin-bottom:10px}
+.result{display:none;background:#eaf2ff;border-left:6px solid var(--blue);padding:14px;border-radius:14px;margin-top:14px}
 .hint{font-size:13px;color:var(--muted)}
+canvas{width:100%;height:220px;background:#fff;border-radius:12px}
+table{width:100%;border-collapse:collapse;background:#fff;margin-top:14px}
+th,td{padding:10px;border-bottom:1px solid #eee;text-align:center}
+.saved{display:none;background:#fff;padding:14px;border-radius:14px;margin-top:14px}
+.savedItem{border:1px solid #ddd;padding:10px;border-radius:10px;margin-bottom:8px}
 </style>
 </head>
 
@@ -65,8 +59,8 @@ th,td{padding:10px;border-bottom:1px solid var(--line);text-align:center}
 <div>
 <label>Період</label>
 <select id="rateType">
-<option value="month">%/міс</option>
-<option value="year">%/рік</option>
+<option value="month">% / місяць</option>
+<option value="year">% / рік</option>
 </select>
 </div>
 </div>
@@ -80,7 +74,7 @@ th,td{padding:10px;border-bottom:1px solid var(--line);text-align:center}
 <label>Тип</label>
 <select id="loanType">
 <option value="annuity">Аннуїтет</option>
-<option value="diff">Диференц.</option>
+<option value="diff">Диференційований</option>
 </select>
 </div>
 </div>
@@ -90,34 +84,30 @@ th,td{padding:10px;border-bottom:1px solid var(--line);text-align:center}
 <button class="light" onclick="toggleSaved()">Історія</button>
 </div>
 
-<div id="result" class="result-box">
-<div id="rateWarning" class="hint"></div>
+<div id="result" class="result">
+<div id="warning" class="hint"></div>
 
-<p>Всього: <b id="total"></b></p>
-<p>Переплата: <b id="overpay"></b></p>
-<p>Місячний: <b id="monthly"></b></p>
+<p><b>Всього:</b> <span id="total"></span></p>
+<p><b>Переплата:</b> <span id="overpay"></span></p>
+<p><b>Місячний:</b> <span id="monthly"></span></p>
 
-<div class="chartWrap">
 <canvas id="chart"></canvas>
-</div>
 
-<div class="tableWrap">
-<table id="paymentTable">
+<table>
 <thead>
 <tr><th>Міс</th><th>%</th><th>Платіж</th><th>Залишок</th></tr>
 </thead>
-<tbody></tbody>
+<tbody id="table"></tbody>
 </table>
-</div>
 
 <div class="actions">
-<button onclick="saveCalculation()">Зберегти</button>
-<button class="light" onclick="exportPDF()">PDF</button>
-<button class="light" onclick="exportExcel()">Excel</button>
+<button onclick="saveCalc()">💾 Зберегти</button>
+<button class="light" onclick="exportPDF()">📄 PDF</button>
+<button class="light" onclick="exportExcel()">📊 Excel</button>
 </div>
 </div>
 
-<div id="savedBox" class="savedBox">
+<div id="saved" class="saved">
 <button class="danger" onclick="clearSaved()">Очистити</button>
 <div id="savedList"></div>
 </div>
@@ -129,86 +119,93 @@ th,td{padding:10px;border-bottom:1px solid var(--line);text-align:center}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-function fmt(n){return Number(n).toFixed(2)}
-function rate(){let p=+percent.value;return rateType.value==='year'?p/100/12:p/100}
+const fmt = n => n.toFixed(2)
+
+function getRate(){
+  let p=+percent.value
+  return rateType.value==='year'?p/100/12:p/100
+}
 
 function calculate(){
-let s=+sum.value,m=+months.value,r=rate()
-if(!s||!m)return alert('Заповніть поля')
+  let s=+sum.value,m=+months.value,r=getRate()
+  if(!s||!m)return alert('Заповніть поля')
 
-let ann=[],diff=[],bal=s,tbody=paymentTable.querySelector('tbody')
-tbody.innerHTML=''
-let total=0
+  let ann=[],diff=[],bal=s
+  table.innerHTML=''
+  let total=0
 
-// аннуитет
-let mp=r? s*r/(1-Math.pow(1+r,-m)) : s/m
-for(let i=1;i<=m;i++){
-let int=bal*r,pr=mp-int
-bal-=pr;if(bal<0)bal=0
-ann.push(bal)
-tbody.innerHTML+=`<tr><td>${i}</td><td>${fmt(int)}</td><td>${fmt(mp)}</td><td>${fmt(bal)}</td></tr>`
-total+=mp
+  let mp=r? s*r/(1-Math.pow(1+r,-m)) : s/m
+
+  for(let i=1;i<=m;i++){
+    let int=bal*r
+    let pr=mp-int
+    bal-=pr;if(bal<0)bal=0
+    ann.push(bal)
+    table.innerHTML+=`<tr><td>${i}</td><td>${fmt(int)}</td><td>${fmt(mp)}</td><td>${fmt(bal)}</td></tr>`
+    total+=mp
+  }
+
+  bal=s
+  let part=s/m
+  for(let i=1;i<=m;i++){
+    bal-=part;if(bal<0)bal=0
+    diff.push(bal)
+  }
+
+  drawChart(ann,diff)
+
+  totalSpan(total,mp,s,r)
 }
 
-// дифф
-bal=s
-let part=s/m
-for(let i=1;i<=m;i++){
-let int=bal*r
-bal-=part;if(bal<0)bal=0
-diff.push(bal)
-}
+function totalSpan(total,mp,s,r){
+  totalSpan=total
+  totalEl.innerText=fmt(total)
+  overpay.innerText=fmt(total-s)
+  monthly.innerText=fmt(mp)
 
-drawChart(ann,diff)
+  warning.innerText =
+    r>=0.3?'⚠️ Кабальний %':
+    r>=0.05?'❗ Високий %':'✅ Норма'
 
-total.innerText=fmt(total)
-overpay.innerText=fmt(total-s)
-monthly.innerText=fmt(mp)
-
-rateWarning.innerText=
-r>=0.3?'⚠️ Кабальний %':
-r>=0.05?'❗ Високий %':'✅ Норма'
-
-result.style.display='block'
-window.lastCalc={s,m,r,total}
+  result.style.display='block'
+  window.last={s,total,mp}
 }
 
 function drawChart(a,b){
-let c=chart,ctx=c.getContext('2d')
-c.width=c.offsetWidth;ctx.clearRect(0,0,c.width,c.height)
-let max=Math.max(...a,...b)
-let step=c.width/(a.length-1)
-function line(d,col){
-ctx.beginPath()
-d.forEach((v,i)=>{
-let x=i*step,y=c.height-v/max*c.height
-i?ctx.lineTo(x,y):ctx.moveTo(x,y)
-})
-ctx.strokeStyle=col;ctx.lineWidth=3;ctx.stroke()
-}
-line(a,'#1f5bff');line(b,'#16a34a')
+  let c=chart,ctx=c.getContext('2d')
+  c.width=c.offsetWidth;ctx.clearRect(0,0,c.width,c.height)
+  let max=Math.max(...a,...b),step=c.width/(a.length-1)
+  const line=(d,col)=>{
+    ctx.beginPath()
+    d.forEach((v,i)=>{
+      let x=i*step,y=c.height-(v/max*c.height)
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y)
+    })
+    ctx.strokeStyle=col;ctx.lineWidth=3;ctx.stroke()
+  }
+  line(a,'#1f5bff');line(b,'#16a34a')
 }
 
-function saveCalculation(){
-let arr=JSON.parse(localStorage.getItem('calculations')||'[]')
-arr.push(window.lastCalc)
-localStorage.setItem('calculations',JSON.stringify(arr))
-renderSaved()
+function saveCalc(){
+  let arr=JSON.parse(localStorage.getItem('calc')||'[]')
+  arr.push(window.last)
+  localStorage.setItem('calc',JSON.stringify(arr))
+  renderSaved()
 }
 
 function renderSaved(){
-let arr=JSON.parse(localStorage.getItem('calculations')||'[]')
-savedList.innerHTML=arr.map(x=>`<div class="savedItem">Сума ${x.s}</div>`).join('')
+  let arr=JSON.parse(localStorage.getItem('calc')||'[]')
+  savedList.innerHTML=arr.map(x=>`<div class="savedItem">Сума ${x.s}</div>`).join('')
 }
 
 function clearSaved(){
-localStorage.removeItem('calculations')
-renderSaved()
+  localStorage.removeItem('calc')
+  renderSaved()
 }
 
 function toggleSaved(){
-savedBox.style.display=savedBox.style.display?'':'block'
-renderSaved()
+  saved.style.display=saved.style.display?'':'block'
+  renderSaved()
 }
 
 function exportPDF(){html2pdf().from(result).save()}
@@ -217,5 +214,3 @@ function exportExcel(){XLSX.writeFile(XLSX.utils.book_new(),'calc.xlsx')}
 
 </body>
 </html>
-
-
