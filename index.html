@@ -370,6 +370,55 @@
       if (!isFinite(n)) return '0.00';
       return (Math.round(n * 100) / 100).toFixed(2);
     }
+    function exportPDF(){
+  if (resultBox.style.display === 'none'){
+    alert('Спочатку зробіть розрахунок');
+    return;
+  }
+
+  // ⚠️ ВАЖНО: дать браузеру перерисовать DOM
+  resultBox.style.display = 'block';
+
+  setTimeout(() => {
+    html2pdf().set({
+      margin: 10,
+      filename: 'kredit-rozrahunok.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(resultBox).save();
+  }, 100);
+}
+function exportExcel(){
+  if (resultBox.style.display === 'none'){
+    alert('Спочатку зробіть розрахунок');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  // ✅ Таблица платежей
+  const table = document.getElementById('paymentTable');
+  const ws1 = XLSX.utils.table_to_sheet(table);
+  XLSX.utils.book_append_sheet(wb, ws1, 'Графік платежів');
+
+  // ✅ Итоги
+  const summary = [
+    ['Дата', new Date().toLocaleString()],
+    ['Сума', sumEl.value],
+    ['Відсоток', percentEl.value],
+    ['Період', rateTypeEl.value],
+    ['Місяців', monthsEl.value],
+    ['Всього', totalOut.textContent],
+    ['Переплата', overpayOut.textContent],
+    ['Платіж', monthlyOut.textContent]
+  ];
+
+  const ws2 = XLSX.utils.aoa_to_sheet(summary);
+  XLSX.utils.book_append_sheet(wb, ws2, 'Підсумок');
+
+  XLSX.writeFile(wb, 'kredit-rozrahunok.xlsx');
+}
 
     function nowStr(){
       return new Date().toLocaleString();
