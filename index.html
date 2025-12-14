@@ -142,8 +142,19 @@ tbody.innerHTML = '';
 let balance = sum;
 
 for (let i = 1; i <= months; i++) {
+
+  if (balance <= 0) {
+    break; // останавливаем график
+  }
+
   const interest = balance * monthlyPercent;
-  balance = balance + interest - monthlyPay;
+
+  let payment = monthlyPay;
+  if (balance + interest < monthlyPay) {
+    payment = balance + interest; // последний платёж
+  }
+
+  balance = balance + interest - payment;
 
   const row = document.createElement('tr');
 
