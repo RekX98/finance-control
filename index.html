@@ -175,7 +175,11 @@
       </div>
 
       <button type="button" onclick="calculate()">Порахувати</button>
-
+      <label>Тип кредиту</label>
+<select id="creditType">
+  <option value="annuity">Аннуїтетний (рівний платіж)</option>
+  <option value="diff">Диференційований</option>
+</select>
       <div id="result" class="result-box">
         <div class="result-line">Загальна сума: <span id="total">0.00</span> грн</div>
         <div class="result-line">Переплата: <span id="overpay">0.00</span> грн</div>
@@ -254,11 +258,22 @@
       if (rateType === 'year') return (percent / 100) / 12;
       return (percent / 100);
     }
+    function addRow(month, interest, payment, balance) {
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${month}</td>
+    <td>${interest.toFixed(2)}</td>
+    <td>${payment.toFixed(2)}</td>
+    <td>${balance.toFixed(2)}</td>
+  `;
+  document.querySelector('#paymentTable tbody').appendChild(row);
+}
 
     function calculate(){
       const sum = Number(document.getElementById('sum').value);
       const months = Number(document.getElementById('months').value);
       const loanType = document.getElementById('loanType').value; // annuity|diff
+      const creditType = document.getElementById('creditType').value;
       const r = getMonthlyRate();
 
       if (!sum || !months){
@@ -273,13 +288,40 @@
         alert('Сума має бути більше 0');
         return;
       }
+      if (creditType === 'annuity') {
+
+  const monthlyPercent = percent / 100;
+  const r = monthlyPercent;
+  const n = months;
+
+  const monthlyPay = sum * r / (1 - Math.pow(1 + r, -n));
+
+  for (let i = 1; i <= n; i++) {
+    const interest = balance * r;
+    const principal = monthlyPay - interest;
+
+    balance -= principal;
+    if (balance < 0.01) balance = 0;
+
+    totalPaid += monthlyPay;
+    totalInterest += interest;
+
+    chartData.push(balance);
+
+    addRow(i, interest, monthlyPay, balance);
+  }
+}
 
       const resultBox = document.getElementById('result');
       const tbody = document.querySelector('#paymentTable tbody');
-
+      tbody.innerHTML = '';
       // очищаємо таблицю
       tbody.innerHTML = '';
       const chartData = [];
+      let balance = sum;
+let totalPaid = 0;
+let totalInterest = 0;
+let chartData = [];
 
       let totalPaid = 0;
       let totalInterest = 0;
@@ -371,6 +413,12 @@ resultBox.scrollIntoView({ behavior: 'smooth' });
 setTimeout(() => {
   drawChart(chartData);
 }, 50);
+      document.getElementById('total').innerText = totalPaid.toFixed(2);
+document.getElementById('overpay').innerText = (totalPaid - sum).toFixed(2);
+document.getElementById('monthly').innerText = monthlyPay.toFixed(2);
+
+drawChart(chartData);
+document.getElementById('result').style.display = 'block';
     }
   </script>
 </body>
