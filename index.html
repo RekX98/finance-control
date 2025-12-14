@@ -1,176 +1,329 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Фінансовий контроль</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f4f8;
-      margin: 0;
+    :root{
+      --blue:#1f5bff;
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e5e7eb;
     }
-    header {
-      background: #1f4fff;
-      color: white;
-      padding: 20px;
-      text-align: center;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
-    main {
-      padding: 20px;
+    header{
+      background:var(--blue);
+      color:#fff;
+      padding:24px 16px;
+      text-align:center;
     }
-    .box {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-  input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  margin-bottom: 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
+    header h1{margin:0;font-size:28px;font-weight:800}
+    header p{margin:8px 0 0;opacity:.9}
 
-button {
-  background: #1f4fff;
-  color: white;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
+    main{max-width:900px;margin:0 auto;padding:16px}
+    .box{
+      background:var(--card);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 10px 25px rgba(15,23,42,.06);
+      margin:14px 0;
+    }
+    .box h2{margin:0 0 10px;font-size:26px}
+    .box p{margin:0;color:var(--muted);line-height:1.4}
 
-button:hover {
-  background: #1737c9;
-  Add button hover
-}
+    label{display:block;margin:10px 0 6px;font-weight:700}
+    input,select{
+      width:100%;
+      padding:12px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      font-size:16px;
+      outline:none;
+      background:#fff;
+    }
+    input:focus,select:focus{border-color:rgba(31,91,255,.6);box-shadow:0 0 0 4px rgba(31,91,255,.12)}
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width:720px){
+      .row{grid-template-columns:1fr}
+    }
 
-#result {
-  margin-top: 15px;
-  font-weight: bold;
-  white-space: pre-line;
-}
-  .result-box {
-  margin-top: 15px;
-  padding: 15px;
-  background: #f1f7ff;
-  border-left: 4px solid #1f4fff;
-  border-radius: 6px;
-  font-size: 16px;
-  }
+    button{
+      display:inline-block;
+      margin-top:14px;
+      padding:12px 18px;
+      background:var(--blue);
+      color:#fff;
+      border:none;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    button:active{transform:translateY(1px)}
+
+    .result-box{
+      display:none;
+      margin-top:14px;
+      background:#eaf2ff;
+      border-left:6px solid var(--blue);
+      border-radius:14px;
+      padding:14px;
+    }
+    .result-line{
+      font-size:18px;
+      margin:10px 0;
+      font-weight:800;
+    }
+    .muted{color:var(--muted);font-weight:600}
+
+    .tableWrap{
+      margin-top:14px;
+      overflow:auto;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.08);
+      background:#fff;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:520px;
+    }
+    th,td{
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      text-align:center;
+      font-variant-numeric: tabular-nums;
+      white-space:nowrap;
+    }
+    th{
+      background:#f1f5ff;
+      font-weight:900;
+    }
+    tr:last-child td{border-bottom:none}
+    .hint{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:6px;
+    }
   </style>
 </head>
+
 <body>
+  <header>
+    <h1>Фінансовий контроль</h1>
+    <p>Просто та зрозуміло</p>
+  </header>
 
-<header>
-  <h1>Фінансовий контроль</h1>
-  <p>Просто та зрозуміло</p>
-</header>
-<main>
-  <div class="box">
-    <h2>Для чого цей сайт</h2>
-    <p>Контроль боргів, платежів та фінансових рішень.</p>
-  </div>
-
-  <div class="box">
-    <h2>Калькулятор боргу</h2>
-
-    <label>Сума боргу (грн)</label><br>
-    <input type="number" id="sum" placeholder="Наприклад: 10000"><br><br>
-
-    <label>Відсоток (% на місяць)</label><br>
-    <input type="number" id="percent" placeholder="Наприклад: 5"><br><br>
-
-    <label>Термін (місяців)</label><br>
-    <input type="number" id="months" placeholder="Наприклад: 12"><br><br>
-    <label>Тип кредиту</label><br>
-<select id="type">
-  <option value="annuity">Аннуїтетний (рівний платіж)</option>
-  <option value="diff">Диференційований (платіж зменшується)</option>
-</select><br><br>
-    <button onclick="calculate()">Порахувати</button>
-
-    <div id="result" class="result-box" style="display:none;">
-
-  <p><strong>Загальна сума:</strong> <span id="total"></span></p>
-  <p><strong>Переплата:</strong> <span id="overpay"></span></p>
-  <p><strong>Щомісячний платіж:</strong> <span id="monthly"></span></p>
-
-  <div id="tableBox" style="margin-top:20px; display:none;">
-    <h3>Графік платежів</h3>
-
-    <table id="paymentTable" border="1" width="100%" cellpadding="6">
-      <thead>
-        <tr>
-          <th>Місяць</th>
-          <th>Відсотки</th>
-          <th>Платіж</th>
-          <th>Залишок</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-  </div>
-
+  <main>
+    <div class="box">
+      <h2>Для чого цей сайт</h2>
+      <p>Контроль боргів, платежів та фінансових рішень.</p>
     </div>
-</main>
-<script>
-function calculate() {
-  const type = document.getElementById('type').value;
-  const sum = Number(document.getElementById('sum').value);
-  const percent = Number(document.getElementById('percent').value);
-  const months = Number(document.getElementById('months').value);
 
-  if (!sum || !percent || !months) {
-    alert('Заповніть всі поля');
-    return;
-  }
+    <div class="box">
+      <h2>Калькулятор боргу</h2>
 
-  const monthlyPercent = percent / 100;
-  const r = monthlyPercent;
-const n = months;
+      <label>Сума боргу (грн)</label>
+      <input type="number" id="sum" placeholder="Наприклад: 10000" inputmode="numeric" />
 
-const monthlyPay = sum * r / (1 - Math.pow(1 + r, -n));
-const total = monthlyPay * n;
-const overpay = total - sum;
-  // показуємо блок результатів
-document.getElementById('result').style.display = 'block';
-document.getElementById('tableBox').style.display = 'block';
+      <div class="row">
+        <div>
+          <label>Відсоток</label>
+          <input type="number" id="percent" placeholder="Наприклад: 5" inputmode="decimal" />
+          <div class="hint">Можна вводити 5 або 55 — як у договорі.</div>
+        </div>
+        <div>
+          <label>Період відсотка</label>
+          <select id="rateType">
+            <option value="month">% на місяць</option>
+            <option value="year">% на рік</option>
+          </select>
+          <div class="hint">Якщо % на рік — автоматично поділимо на 12.</div>
+        </div>
+      </div>
 
-// очищаємо таблицю
-const tbody = document.querySelector('#paymentTable tbody');
-tbody.innerHTML = '';
+      <div class="row">
+        <div>
+          <label>Термін (місяців)</label>
+          <input type="number" id="months" placeholder="Наприклад: 12" inputmode="numeric" />
+        </div>
+        <div>
+          <label>Тип кредиту</label>
+          <select id="loanType">
+            <option value="annuity">Аннуїтетний (рівний платіж)</option>
+            <option value="diff">Диференційований (тіло рівними частинами)</option>
+          </select>
+        </div>
+      </div>
 
-let balance = sum;
-for (let i = 1; i <= n; i++) {
-  const interest = balance * r;
-  const principal = monthlyPay - interest;
-  balance -= principal;
+      <button type="button" onclick="calculate()">Порахувати</button>
 
-  if (balance < 0) balance = 0;
+      <div id="result" class="result-box">
+        <div class="result-line">Загальна сума: <span id="total">0.00</span> грн</div>
+        <div class="result-line">Переплата: <span id="overpay">0.00</span> грн</div>
+        <div class="result-line">Щомісячний платіж: <span id="monthly">0.00</span> грн</div>
 
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>${i}</td>
-    <td>${interest.toFixed(2)}</td>
-    <td>${monthlyPay.toFixed(2)}</td>
-    <td>${balance.toFixed(2)}</td>
-  `;
-  tbody.appendChild(row);
-}
+        <h3 style="margin:18px 0 10px;">Графік платежів</h3>
+        <div class="tableWrap">
+          <table id="paymentTable">
+            <thead>
+              <tr>
+                <th>Місяць</th>
+                <th>Відсотки</th>
+                <th>Платіж</th>
+                <th>Залишок</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
 
-  document.getElementById('total').innerText = total.toFixed(2);
-  document.getElementById('overpay').innerText = overpay.toFixed(2);
-  document.getElementById('monthly').innerText = monthlyPay.toFixed(2);
+        <div class="hint" style="margin-top:10px;">
+          Увага: це спрощений розрахунок (без комісій/штрафів/страховок).
+        </div>
+      </div>
+    </div>
+  </main>
 
-  document.getElementById('result').style.display = 'block';
-}
-</script>
+  <script>
+    function fmt(n){
+      return (Math.round(n * 100) / 100).toFixed(2);
+    }
+
+    function getMonthlyRate(){
+      const percent = Number(document.getElementById('percent').value);
+      const rateType = document.getElementById('rateType').value; // month|year
+      if (!percent) return 0;
+
+      // r = monthly rate in decimals
+      if (rateType === 'year') return (percent / 100) / 12;
+      return (percent / 100);
+    }
+
+    function calculate(){
+      const sum = Number(document.getElementById('sum').value);
+      const months = Number(document.getElementById('months').value);
+      const loanType = document.getElementById('loanType').value; // annuity|diff
+      const r = getMonthlyRate();
+
+      if (!sum || !months){
+        alert('Заповніть всі поля');
+        return;
+      }
+      if (months <= 0){
+        alert('Термін має бути більше 0');
+        return;
+      }
+      if (sum <= 0){
+        alert('Сума має бути більше 0');
+        return;
+      }
+
+      const resultBox = document.getElementById('result');
+      const tbody = document.querySelector('#paymentTable tbody');
+
+      // очищаємо таблицю
+      tbody.innerHTML = '';
+
+      let totalPaid = 0;
+      let totalInterest = 0;
+
+      if (loanType === 'annuity'){
+        // Аннуїтет: рівний платіж
+        let monthlyPay;
+        if (r === 0){
+          monthlyPay = sum / months;
+        } else {
+          // A = S * r / (1 - (1+r)^-n)
+          monthlyPay = sum * r / (1 - Math.pow(1 + r, -months));
+        }
+
+        let balance = sum;
+
+        for (let i = 1; i <= months; i++){
+          const interest = balance * r;
+          let principal = monthlyPay - interest;
+
+          // якщо останній платіж «переплачує» копійки — підрізаємо
+          if (principal > balance) {
+            principal = balance;
+          }
+
+          const payment = principal + interest;
+          balance = balance - principal;
+          if (balance < 0.01) balance = 0;
+
+          totalPaid += payment;
+          totalInterest += interest;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${i}</td>
+            <td>${fmt(interest)}</td>
+            <td>${fmt(payment)}</td>
+            <td>${fmt(balance)}</td>
+          `;
+          tbody.appendChild(row);
+        }
+
+        document.getElementById('monthly').innerText = fmt(monthlyPay);
+
+      } else {
+        // Диференційований: тіло рівними частинами
+        const principalPart = sum / months;
+        let balance = sum;
+
+        // покажемо "типовий" платіж першого місяця як "щомісячний"
+        const firstMonthPay = principalPart + (balance * r);
+        document.getElementById('monthly').innerText = fmt(firstMonthPay);
+
+        for (let i = 1; i <= months; i++){
+          const interest = balance * r;
+          let principal = principalPart;
+
+          // останній місяць — закриваємо залишок точно
+          if (principal > balance) principal = balance;
+
+          const payment = principal + interest;
+          balance = balance - principal;
+          if (balance < 0.01) balance = 0;
+
+          totalPaid += payment;
+          totalInterest += interest;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${i}</td>
+            <td>${fmt(interest)}</td>
+            <td>${fmt(payment)}</td>
+            <td>${fmt(balance)}</td>
+          `;
+          tbody.appendChild(row);
+        }
+      }
+
+      const overpay = totalPaid - sum;
+
+      document.getElementById('total').innerText = fmt(totalPaid);
+      document.getElementById('overpay').innerText = fmt(overpay);
+
+      // показываем блок результатов
+      resultBox.style.display = 'block';
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
 </body>
 </html>
