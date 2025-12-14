@@ -6,85 +6,43 @@
 <title>Фінансовий контроль</title>
 
 <style>
-:root{
-  --blue:#1f5bff;
-  --bg:#f4f6fb;
-  --card:#fff;
-  --text:#0f172a;
-  --muted:#64748b;
-  --danger:#dc2626;
-  --ok:#16a34a;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
-header{background:var(--blue);color:#fff;padding:24px;text-align:center}
-main{max-width:960px;margin:auto;padding:16px}
-.box{background:var(--card);border-radius:16px;padding:18px;margin:14px 0}
-label{display:block;margin-top:10px;font-weight:800}
-input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:720px){.row{grid-template-columns:1fr}}
-button{padding:12px 16px;border:none;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;cursor:pointer}
-button.light{background:#eaf2ff;color:#000}
-button.danger{background:var(--danger)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.result{display:none;background:#eaf2ff;border-left:6px solid var(--blue);padding:14px;border-radius:14px;margin-top:14px}
-.hint{font-size:13px;color:var(--muted)}
-canvas{width:100%;height:220px;background:#fff;border-radius:12px}
-table{width:100%;border-collapse:collapse;background:#fff;margin-top:14px}
-th,td{padding:10px;border-bottom:1px solid #eee;text-align:center}
-.saved{display:none;background:#fff;padding:14px;border-radius:14px;margin-top:14px}
-.savedItem{border:1px solid #ddd;padding:10px;border-radius:10px;margin-bottom:8px}
+body{font-family:system-ui;background:#f4f6fb;margin:0}
+main{max-width:900px;margin:auto;padding:16px}
+.box{background:#fff;border-radius:14px;padding:16px;margin:14px 0}
+label{font-weight:700;display:block;margin-top:10px}
+input,select{width:100%;padding:10px;margin-top:4px}
+button{margin-top:12px;padding:12px 16px;font-weight:800}
+.result{display:none;background:#eaf2ff;padding:14px;border-left:5px solid #1f5bff}
+canvas{width:100%;height:220px;background:#fff;margin-top:12px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border-bottom:1px solid #ddd;padding:8px;text-align:center}
+.hint{font-size:13px;margin-top:6px}
 </style>
 </head>
 
 <body>
-
-<header>
-<h1>Фінансовий контроль</h1>
-<p>Кредитний калькулятор</p>
-</header>
-
 <main>
 
 <div class="box">
 <label>Сума</label>
 <input id="sum" type="number">
 
-<div class="row">
-<div>
 <label>%</label>
 <input id="percent" type="number">
-</div>
-<div>
+
 <label>Період</label>
 <select id="rateType">
 <option value="month">% / місяць</option>
 <option value="year">% / рік</option>
 </select>
-</div>
-</div>
 
-<div class="row">
-<div>
 <label>Місяців</label>
 <input id="months" type="number">
-</div>
-<div>
-<label>Тип</label>
-<select id="loanType">
-<option value="annuity">Аннуїтет</option>
-<option value="diff">Диференційований</option>
-</select>
-</div>
-</div>
 
-<div class="actions">
 <button onclick="calculate()">Порахувати</button>
-<button class="light" onclick="toggleSaved()">Історія</button>
 </div>
 
-<div id="result" class="result">
+<div id="result" class="box result">
 <div id="warning" class="hint"></div>
 
 <p><b>Всього:</b> <span id="total"></span></p>
@@ -97,120 +55,104 @@ th,td{padding:10px;border-bottom:1px solid #eee;text-align:center}
 <thead>
 <tr><th>Міс</th><th>%</th><th>Платіж</th><th>Залишок</th></tr>
 </thead>
-<tbody id="table"></tbody>
+<tbody id="tableBody"></tbody>
 </table>
-
-<div class="actions">
-<button onclick="saveCalc()">💾 Зберегти</button>
-<button class="light" onclick="exportPDF()">📄 PDF</button>
-<button class="light" onclick="exportExcel()">📊 Excel</button>
-</div>
 </div>
 
-<div id="saved" class="saved">
-<button class="danger" onclick="clearSaved()">Очистити</button>
-<div id="savedList"></div>
-</div>
-
-</div>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <script>
-const fmt = n => n.toFixed(2)
+const sumEl = document.getElementById('sum')
+const percentEl = document.getElementById('percent')
+const rateTypeEl = document.getElementById('rateType')
+const monthsEl = document.getElementById('months')
+
+const totalEl = document.getElementById('total')
+const overpayEl = document.getElementById('overpay')
+const monthlyEl = document.getElementById('monthly')
+const tableBody = document.getElementById('tableBody')
+const resultBox = document.getElementById('result')
+const warningEl = document.getElementById('warning')
+const chart = document.getElementById('chart')
 
 function getRate(){
-  let p=+percent.value
-  return rateType.value==='year'?p/100/12:p/100
+  const p = Number(percentEl.value)
+  return rateTypeEl.value === 'year' ? p/100/12 : p/100
 }
+
+function fmt(n){ return n.toFixed(2) }
 
 function calculate(){
-  let s=+sum.value,m=+months.value,r=getRate()
-  if(!s||!m)return alert('Заповніть поля')
+  const sum = Number(sumEl.value)
+  const months = Number(monthsEl.value)
+  const r = getRate()
 
-  let ann=[],diff=[],bal=s
-  table.innerHTML=''
-  let total=0
-
-  let mp=r? s*r/(1-Math.pow(1+r,-m)) : s/m
-
-  for(let i=1;i<=m;i++){
-    let int=bal*r
-    let pr=mp-int
-    bal-=pr;if(bal<0)bal=0
-    ann.push(bal)
-    table.innerHTML+=`<tr><td>${i}</td><td>${fmt(int)}</td><td>${fmt(mp)}</td><td>${fmt(bal)}</td></tr>`
-    total+=mp
+  if(!sum || !months){
+    alert('Заповніть всі поля')
+    return
   }
 
-  bal=s
-  let part=s/m
-  for(let i=1;i<=m;i++){
-    bal-=part;if(bal<0)bal=0
-    diff.push(bal)
+  tableBody.innerHTML = ''
+  let balance = sum
+  let total = 0
+  let chartData = []
+
+  const monthly = r === 0
+    ? sum / months
+    : sum * r / (1 - Math.pow(1+r, -months))
+
+  for(let i=1;i<=months;i++){
+    const interest = balance * r
+    let principal = monthly - interest
+    if(principal > balance) principal = balance
+
+    balance -= principal
+    if(balance < 0.01) balance = 0
+
+    total += principal + interest
+    chartData.push(balance)
+
+    tableBody.innerHTML += `
+      <tr>
+        <td>${i}</td>
+        <td>${fmt(interest)}</td>
+        <td>${fmt(principal+interest)}</td>
+        <td>${fmt(balance)}</td>
+      </tr>`
   }
 
-  drawChart(ann,diff)
+  totalEl.textContent = fmt(total)
+  overpayEl.textContent = fmt(total - sum)
+  monthlyEl.textContent = fmt(monthly)
 
-  totalSpan(total,mp,s,r)
+  warningEl.textContent =
+    r >= 0.3 ? '⚠️ Кабальний %' :
+    r >= 0.05 ? '❗ Високий %' :
+    '✅ Нормальний %'
+
+  drawChart(chartData)
+  resultBox.style.display = 'block'
 }
 
-function totalSpan(total,mp,s,r){
-  totalSpan=total
-  totalEl.innerText=fmt(total)
-  overpay.innerText=fmt(total-s)
-  monthly.innerText=fmt(mp)
+function drawChart(data){
+  const ctx = chart.getContext('2d')
+  chart.width = chart.offsetWidth
+  chart.height = 220
+  ctx.clearRect(0,0,chart.width,chart.height)
 
-  warning.innerText =
-    r>=0.3?'⚠️ Кабальний %':
-    r>=0.05?'❗ Високий %':'✅ Норма'
+  const max = Math.max(...data)
+  const step = chart.width/(data.length-1)
 
-  result.style.display='block'
-  window.last={s,total,mp}
+  ctx.beginPath()
+  data.forEach((v,i)=>{
+    const x = i*step
+    const y = chart.height - (v/max)*chart.height
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y)
+  })
+  ctx.strokeStyle = '#1f5bff'
+  ctx.lineWidth = 3
+  ctx.stroke()
 }
-
-function drawChart(a,b){
-  let c=chart,ctx=c.getContext('2d')
-  c.width=c.offsetWidth;ctx.clearRect(0,0,c.width,c.height)
-  let max=Math.max(...a,...b),step=c.width/(a.length-1)
-  const line=(d,col)=>{
-    ctx.beginPath()
-    d.forEach((v,i)=>{
-      let x=i*step,y=c.height-(v/max*c.height)
-      i?ctx.lineTo(x,y):ctx.moveTo(x,y)
-    })
-    ctx.strokeStyle=col;ctx.lineWidth=3;ctx.stroke()
-  }
-  line(a,'#1f5bff');line(b,'#16a34a')
-}
-
-function saveCalc(){
-  let arr=JSON.parse(localStorage.getItem('calc')||'[]')
-  arr.push(window.last)
-  localStorage.setItem('calc',JSON.stringify(arr))
-  renderSaved()
-}
-
-function renderSaved(){
-  let arr=JSON.parse(localStorage.getItem('calc')||'[]')
-  savedList.innerHTML=arr.map(x=>`<div class="savedItem">Сума ${x.s}</div>`).join('')
-}
-
-function clearSaved(){
-  localStorage.removeItem('calc')
-  renderSaved()
-}
-
-function toggleSaved(){
-  saved.style.display=saved.style.display?'':'block'
-  renderSaved()
-}
-
-function exportPDF(){html2pdf().from(result).save()}
-function exportExcel(){XLSX.writeFile(XLSX.utils.book_new(),'calc.xlsx')}
 </script>
-
 </body>
 </html>
