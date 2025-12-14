@@ -25,6 +25,36 @@
       border-radius: 8px;
       margin-bottom: 15px;
     }
+  input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+button {
+  background: #1f4fff;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1737c9;
+  Add button hover
+}
+
+#result {
+  margin-top: 15px;
+  font-weight: bold;
+  white-space: pre-line;
+}
   </style>
 </head>
 <body>
@@ -39,25 +69,29 @@
     <h2>Для чого цей сайт</h2>
     <p>Контроль боргів, платежів та фінансових рішень.</p>
   </div>
+<main>
+  <div class="box">
+    <h2>Для чого цей сайт</h2>
+    <p>Контроль боргів, платежів та фінансових рішень.</p>
+  </div>
 
-  
-    <div class="box">
-  <h2>Калькулятор боргу</h2>
+  <div class="box">
+    <h2>Калькулятор боргу</h2>
 
-  <label>Сума боргу (грн)</label><br>
-  <input type="number" id="sum" placeholder="Наприклад: 10000"><br><br>
+    <label>Сума боргу (грн)</label><br>
+    <input type="number" id="sum" placeholder="Наприклад: 10000"><br><br>
 
-  <label>Відсоток (% на місяць)</label><br>
-  <input type="number" id="percent" placeholder="Наприклад: 5"><br><br>
+    <label>Відсоток (% на місяць)</label><br>
+    <input type="number" id="percent" placeholder="Наприклад: 5"><br><br>
 
-  <label>Термін (місяців)</label><br>
-  <input type="number" id="months" placeholder="Наприклад: 12"><br><br>
+    <label>Термін (місяців)</label><br>
+    <input type="number" id="months" placeholder="Наприклад: 12"><br><br>
 
-  <button onclick="calculate()">Порахувати</button>
+    <button onclick="calculate()">Порахувати</button>
 
-  <p id="result" style="margin-top:15px;font-weight:bold; white-space: pre-line;"></p>
-</div>
-
+    <p id="result"></p>
+  </div>
+</main>
 <script>
 function calculate() {
   const sum = Number(document.getElementById('sum').value);
@@ -69,16 +103,16 @@ function calculate() {
     return;
   }
 
-  const total = sum + (sum * (percent / 100) * months);
+  const monthlyPercent = percent / 100;
+  const total = sum + (sum * monthlyPercent * months);
   const overpay = total - sum;
+  const monthlyPay = total / months;
 
   document.getElementById('result').innerText =
     'Загальна сума: ' + total.toFixed(2) + ' грн\n' +
-    'Переплата: ' + overpay.toFixed(2) + ' грн';
+    'Переплата: ' + overpay.toFixed(2) + ' грн\n' +
+    'Щомісячний платіж: ' + monthlyPay.toFixed(2) + ' грн';
 }
 </script>
-    
-</main>
-
 </body>
 </html>
