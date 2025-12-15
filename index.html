@@ -3,11 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Фіext:#0f172a;
-      --muted:#64748b;
-      --lнансовий контроль</title>
-  <meta name="description" content="Безкоштовний кредитний калькулятор: ануїтет, диференційовані платежі, графік боргу, переплата та попередження про кабальні відсотки. Без реклами та реєстрації.">
-  <meta name="keywords" content="кредитний калькулятор, калькулятор кредиту, переплата по кредиту, ануїтет, диференційований платіж">
+  <title>Фінансовий контроль — кредитний калькулятор</title>
+  <meta name="description" content="Безкоштовний кредитний калькулятор: ануїтет і диференційований платіж, порівняння на графіку, таблиця платежів, переплата та попередження про кабальні відсотки. Без реклами та реєстрації." />
+  <meta name="keywords" content="кредитний калькулятор, калькулятор кредиту, ануїтет, диференційований платіж, переплата по кредиту, графік боргу, платежі" />
 
 
   <style>
@@ -228,16 +226,64 @@
       .tableWrap{overflow:visible}
       table{min-width:auto}
     }
+  
+    /* Top navigation */
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:linear-gradient(135deg,#1f5bff,#3b82f6);
+      color:#fff;
+      padding:14px 16px;
+    }
+    .topbar-inner{
+      max-width:1100px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .logo{
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:18px;
+    }
+    .menu{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .menu a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:900;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(255,255,255,.10);
+    }
+    .menu a:hover{background:rgba(255,255,255,.18)}
+
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>Фінансовий контроль</h1>
-    <p>Калькулятор кредиту · графік · збереження · експорт</p>
+  
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">Фінансовий контроль</div>
+      <nav class="menu">
+        <a href="index.html">Головна</a>
+        <a href="credit-guide.html">Як рахувати</a>
+        <a href="faq.html">FAQ</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
+<main>
     <div class="box">
       <h2>Навіщо цей калькулятор</h2>
   <p>
@@ -357,6 +403,45 @@
   <!-- libs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <section id="faq" class="box">
+  <h2>Часті питання про кредит</h2>
+
+  <h3>Що таке ануїтетний платіж?</h3>
+  <p>
+    Ануїтет — це схема кредиту, при якій ви щомісяця платите однакову суму.
+    На початку більша частина платежу йде на відсотки, а тіло кредиту
+    зменшується повільно. Загальна переплата зазвичай більша.
+  </p>
+
+  <h3>Що таке диференційований платіж?</h3>
+  <p>
+    При диференційованому платежі тіло кредиту ділиться на рівні частини,
+    а відсотки нараховуються на залишок боргу. Перші платежі більші,
+    але з кожним місяцем сума зменшується. Переплата зазвичай менша,
+    ніж при ануїтеті.
+  </p>
+
+  <h3>Чому переплата може бути більшою за суму кредиту?</h3>
+  <p>
+    Це трапляється через високі відсоткові ставки або довгий термін кредиту.
+    Особливо це характерно для мікрокредитів з відсотком “на день” або “на місяць”.
+  </p>
+
+  <h3>Чи враховує калькулятор комісії та страховки?</h3>
+  <p>
+    Ні. Калькулятор показує базовий розрахунок: тіло кредиту та відсотки.
+    Комісії, штрафи, страховки та додаткові платежі потрібно перевіряти
+    окремо у договорі.
+  </p>
+
+  <h3>Який тип платежу вигідніший?</h3>
+  <p>
+    Якщо важлива менша переплата — зазвичай вигідніший диференційований платіж.
+    Якщо важлива стабільна сума щомісяця — ануїтет зручніший,
+    але дорожчий у довгостроковій перспективі.
+  </p>
+</section>
+
 
   <script>
     // ---------- DOM ----------
