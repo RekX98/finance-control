@@ -18,7 +18,10 @@
       --danger:#dc2626;
       --warn:#b45309;
       --ok:#16a34a;
-    }
+    
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e5e7eb;}
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -277,9 +280,6 @@
     <div class="topbar-inner">
       <div class="logo">Фінансовий контроль</div>
       <nav class="menu">
-        <a href="index.html">Головна</a>
-        <a href="credit-without-scam.html">Кредит без обману</a>
-        <a href="online-credit-tips.html">Онлайн кредити</a>
         <a href="credit-guide.html">Як рахувати</a>
         <a href="faq.html">FAQ</a>
       </nav>
@@ -304,8 +304,17 @@
 </div>
       <h2 style="margin:0 0 10px;font-size:24px;">Калькулятор боргу</h2>
 
-      <label>Сума боргу (грн)</label>
+      <label>Сума боргу</label>
       <input type="number" id="sum" placeholder="Наприклад: 10000" inputmode="numeric" />
+
+      <label>Валюта</label>
+      <select id="currency">
+        <option value="UAH" data-symbol="₴">UAH ₴</option>
+        <option value="USD" data-symbol="$">USD $</option>
+        <option value="EUR" data-symbol="€">EUR €</option>
+        <option value="PLN" data-symbol="zł">PLN zł</option>
+      </select>
+
 
       <div class="row">
         <div>
@@ -378,7 +387,6 @@
 
         <div class="actions" style="margin-top:12px;">
           <button type="button" id="btnSave">💾 Зберегти</button>
-          <button type="button" class="light" id="btnPDF">📄 PDF</button>
           <button type="button" class="light" id="btnExcel">📊 Excel</button>
           <button type="button" class="light" id="btnPrint">🖨️ Друк</button>
         </div>
@@ -406,7 +414,24 @@
   <!-- libs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <section id="faq" class="box">
+  
+<section id="faq" class="box">
+  <button id="faqToggle" style="
+    width:100%;
+    text-align:left;
+    background:#eaf2ff;
+    border:1px solid rgba(15,23,42,.10);
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:18px;
+    font-weight:900;
+    cursor:pointer;
+   color:#0f172a;">
+    ❓ Часті питання про кредит
+  </button>
+
+  <div id="faqBody" style="display:none; margin-top:14px;">
+
   <h2>Часті питання про кредит</h2>
 
   <h3>Що таке ануїтетний платіж?</h3>
@@ -443,6 +468,7 @@
     Якщо важлива стабільна сума щомісяця — ануїтет зручніший,
     але дорожчий у довгостроковій перспективі.
   </p>
+  </div>
 </section>
 
 
@@ -471,60 +497,17 @@
     const savedList = el('savedList');
 
     // ---------- helpers ----------
+
+    const currencyEl = el('currency');
+    function cur(){
+      const opt = currencyEl.options[currencyEl.selectedIndex];
+      return opt ? opt.dataset.symbol : '₴';
+    }
+
     function fmt(n){
       if (!isFinite(n)) return '0.00';
-      return (Math.round(n * 100) / 100).toFixed(2);
+      return (Math.round(n * 100) / 100).toFixed(2) + ' ' + cur();
     }
-    function exportPDF(){
-  if (resultBox.style.display === 'none'){
-    alert('Спочатку зробіть розрахунок');
-    return;
-  }
-
-  // ⚠️ ВАЖНО: дать браузеру перерисовать DOM
-  resultBox.style.display = 'block';
-
-  setTimeout(() => {
-    html2pdf().set({
-      margin: 10,
-      filename: 'kredit-rozrahunok.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }).from(resultBox).save();
-  }, 100);
-}
-function exportExcel(){
-  if (resultBox.style.display === 'none'){
-    alert('Спочатку зробіть розрахунок');
-    return;
-  }
-
-  const wb = XLSX.utils.book_new();
-
-  // ✅ Таблица платежей
-  const table = document.getElementById('paymentTable');
-  const ws1 = XLSX.utils.table_to_sheet(table);
-  XLSX.utils.book_append_sheet(wb, ws1, 'Графік платежів');
-
-  // ✅ Итоги
-  const summary = [
-    ['Дата', new Date().toLocaleString()],
-    ['Сума', sumEl.value],
-    ['Відсоток', percentEl.value],
-    ['Період', rateTypeEl.value],
-    ['Місяців', monthsEl.value],
-    ['Всього', totalOut.textContent],
-    ['Переплата', overpayOut.textContent],
-    ['Платіж', monthlyOut.textContent]
-  ];
-
-  const ws2 = XLSX.utils.aoa_to_sheet(summary);
-  XLSX.utils.book_append_sheet(wb, ws2, 'Підсумок');
-
-  XLSX.writeFile(wb, 'kredit-rozrahunok.xlsx');
-}
-
     function nowStr(){
       return new Date().toLocaleString();
     }
@@ -956,6 +939,22 @@ function exportExcel(){
       XLSX.writeFile(wb, 'kredit-rozrahunok.xlsx');
     }
 
+    
+    // ---------- FAQ accordion ----------
+    const faqToggle = document.getElementById('faqToggle');
+    const faqBody = document.getElementById('faqBody');
+
+    if (faqToggle && faqBody){
+      faqToggle.addEventListener('click', ()=>{
+        const open = faqBody.style.display === 'block';
+        faqBody.style.display = open ? 'none' : 'block';
+        faqToggle.innerHTML = open
+          ? '❓ Часті питання про кредит'
+          : '❌ Закрити питання';
+      });
+    }
+
+
     // ---------- Clear form ----------
     function clearForm(){
       sumEl.value = '';
@@ -1000,7 +999,6 @@ function exportExcel(){
     el('btnClearHistory').addEventListener('click', clearSaved);
     el('btnExportHistoryCSV').addEventListener('click', exportSavedCSV);
 
-    el('btnPDF').addEventListener('click', exportPDF);
     el('btnExcel').addEventListener('click', exportExcel);
     el('btnPrint').addEventListener('click', () => window.print());
 
