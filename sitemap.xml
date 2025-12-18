@@ -12,8 +12,24 @@
   </url>
 
   <url>
-    <loc>https://finance-control.com.ua/faq.html</loc>
+    <loc>https://finance-control.com.ua/credit-without-scam.html</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://finance-control.com.ua/online-credit-tips.html</loc>
     <priority>0.8</priority>
   </url>
 
+  <url>
+    <loc>https://finance-control.com.ua/credit-0-percent.html</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://finance-control.com.ua/faq.html</loc>
+    <priority>0.7</priority>
+  </url>
+
 </urlset>
+
